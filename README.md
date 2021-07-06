@@ -3,9 +3,15 @@ This project consists of two modules
 - `infrastructure` defines the AWS resources to be deployed in AWS
 
 Before reading on, please go to file `Assembly.kt` in infrastructure/src/main/...
-and change the `label` to [your initials][AG start year], e.g. `IL18
+and change the `label` to [your initials][AG start year], e.g. `IL18`. Also,
+set `account` to the AWS account id.
 
 ### Build ###
+#### Prerequisites ####
+- Java, e.g. by
+> brew install --cask adoptopenjdk15
+
+#### Instructions ####
 The project uses `Gradle` to compile and package the code.
 No installment of Gradle is necessary.
 
@@ -34,7 +40,7 @@ No installment of Gradle is necessary.
   - Log on to https://myapplications.microsoft.com/ with DNB credentials
   - Select AWS SSO --> your account --> Management console
   
-- Get access to AWS from terminal (first time)
+- If first time in terminal:
   - Run 
     > aws configure sso
   - Set `SSO start url` to https://dnbasa.awsapps.com/start
@@ -43,7 +49,7 @@ No installment of Gradle is necessary.
   `CLI profile name` to a shorter name, e.g. `sand`.
   - The result of the configuration can be seen in file `~/.aws/config`
     
-- Reactivate access from terminal (after activating PIM access)
+- Every time you reactivate PIM access, you also need to log in from terminal:
   > aws sso login --profile [profilename]
 
 #### Deploy to AWS using CDK ####
@@ -53,7 +59,7 @@ No installment of Gradle is necessary.
   - Copy the text from option 2) `Add a profile to your AWS credentials file`
   - Store the text in your `~/.aws/credentials` file. Remember to use the 
     same profile name for the account as you used in the config file.
-    
+
 - Check that everything works as expected by running
   > cdk list
 
