@@ -20,18 +20,18 @@ import org.slf4j.LoggerFactory
 
 // This AppLoader is responsible for building our HttpHandler which is supplied to AWS
 object GreeterLambda: AppLoader {
-    private val getGreeting = GetGreeting()
+    private val greetingService = GreetingService()
     override fun invoke(environment: Map<String, String>): HttpHandler {
-        return getGreeting.service
+        return greetingService.service
     }
 }
 
 // Entry point for AWS lambda
-class GetGreetingHandler: ApiGatewayRestLambdaFunction(GreeterLambda)
+class GreeterFunctionHandler: ApiGatewayRestLambdaFunction(GreeterLambda)
 
-class GetGreeting {
+class GreetingService {
     companion object {
-        private val logger = LoggerFactory.getLogger(GetGreeting::class.java)
+        private val logger = LoggerFactory.getLogger(GreetingService::class.java)
     }
 
     val getGreeting: HttpHandler = { request ->

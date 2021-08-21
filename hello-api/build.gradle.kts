@@ -19,10 +19,8 @@ dependencies {
 
 
     // AWS
-    //implementation(Dependency.awsLambda("aws-lambda-java-core"))
-    //implementation(Dependency.awsEvents("aws-lambda-java-events"))
-    //implementation(Dependency.awsSdk("kms"))
-    //implementation(Dependency.awsSdk("ssm"))
+    implementation("com.amazonaws:aws-lambda-java-core:1.2.1")
+    implementation("com.amazonaws:aws-java-sdk-dynamodb:1.12.52")
 
     // Http4k
     implementation("org.http4k:http4k-core:4.9.9.0")

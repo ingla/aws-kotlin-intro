@@ -21,6 +21,7 @@ dependencies {
     implementation("software.amazon.awscdk:core:1.111.0")
     implementation("software.amazon.awscdk:apigateway:1.111.0")
     implementation("software.amazon.awscdk:lambda:1.111.0")
+    implementation("software.amazon.awscdk:dynamodb:1.119.0")
 
 }
 

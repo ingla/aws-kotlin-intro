@@ -1,5 +1,6 @@
 package no.dnb.awsintro.infrastructure
 
+import software.amazon.awscdk.core.Aspects
 import software.amazon.awscdk.core.Construct
 import software.amazon.awscdk.core.Duration
 import software.amazon.awscdk.core.Environment
@@ -58,23 +59,31 @@ class ApiStack private constructor(
     private val restApi: IRestApi
     private val greetingLambda: IFunction
     private val lambdaRole: IRole
+    //private val dynamoDBTable: ITable
 
     init {
         restApi = makeRestApi()
 
         lambdaRole = makeLambdaRole()
 
-        greetingLambda = makeGreetingLambda(
+        greetingLambda = makeLambda(
             logicalId = "GetGreetingFunction",
             baseName = "get-greeting-v1",
-            handler = "no.dnb.awsintro.helloapi.functions.GetGreetingHandler",
+            handler = "no.dnb.awsintro.helloapi.functions.GreeterFunctionHandler",
             role = lambdaRole
         )
+
         restApi.addLambdaIntegration(
             "GET",
             "/v1/greeting/{name}",
             greetingLambda
         )
+
+        /* Remember that all resources you make should be tagged with your initials. */
+        //dynamoDBTable = makeTable()
+        //dynamoDBTable.grantReadWriteData(lambdaRole)
+
+        Aspects.of(this).add(PermissionBoundaryChecker())
     }
 
     private fun makeRestApi(): RestApi {
@@ -106,7 +115,7 @@ class ApiStack private constructor(
         return api
     }
 
-    private fun makeGreetingLambda(
+    private fun makeLambda(
         role: IRole,
         logicalId: String,
         baseName: String,
@@ -143,7 +152,7 @@ class ApiStack private constructor(
         return Role.Builder
             .create(this, "LambdaRole")
             .assumedBy(ServicePrincipal("lambda.amazonaws.com"))
-            .roleName("${props.region}-${props.environment}-${props.baseName}-role")
+            .roleName(props.namespace.prefixWithNamespace("role"))
             .description("Role for greeting lambda")
             .managedPolicies(getManagedPolicies())
             .build()
