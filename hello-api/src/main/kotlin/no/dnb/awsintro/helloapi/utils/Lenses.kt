@@ -1,5 +1,6 @@
 package no.dnb.awsintro.helloapi.utils
 
+import no.dnb.awsintro.helloapi.dynamodb.StringItem
 import no.dnb.awsintro.helloapi.models.Greeting
 import org.http4k.core.Body
 import org.http4k.format.KotlinxSerialization.auto
@@ -15,3 +16,5 @@ will generate a custom response with status '400 Bad Request'.
 
 val namePathParameter = Path.string().of("name")
 val greetingBody = Body.auto<Greeting>().toLens()
+val stringBody = Body.auto<StringItem>().toLens()
+val stringKeyPathParameter = Path.string().of("stringKey")

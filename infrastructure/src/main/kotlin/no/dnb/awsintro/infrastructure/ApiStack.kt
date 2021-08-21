@@ -1,8 +1,10 @@
 package no.dnb.awsintro.infrastructure
 
+import software.amazon.awscdk.core.Aspects
 import software.amazon.awscdk.core.Construct
 import software.amazon.awscdk.core.Duration
 import software.amazon.awscdk.core.Environment
+import software.amazon.awscdk.core.RemovalPolicy
 import software.amazon.awscdk.core.Stack
 import software.amazon.awscdk.core.StackProps
 import software.amazon.awscdk.services.apigateway.EndpointType
@@ -11,6 +13,10 @@ import software.amazon.awscdk.services.apigateway.LogGroupLogDestination
 import software.amazon.awscdk.services.apigateway.MethodLoggingLevel
 import software.amazon.awscdk.services.apigateway.RestApi
 import software.amazon.awscdk.services.apigateway.StageOptions
+import software.amazon.awscdk.services.dynamodb.Attribute
+import software.amazon.awscdk.services.dynamodb.AttributeType
+import software.amazon.awscdk.services.dynamodb.ITable
+import software.amazon.awscdk.services.dynamodb.Table
 import software.amazon.awscdk.services.iam.IManagedPolicy
 import software.amazon.awscdk.services.iam.IRole
 import software.amazon.awscdk.services.iam.ManagedPolicy
@@ -57,7 +63,9 @@ class ApiStack private constructor(
 
     private val restApi: IRestApi
     private val greetingLambda: IFunction
+    private val personLambda: IFunction
     private val lambdaRole: IRole
+    private val dynamoDBTable: ITable
 
     init {
         restApi = makeRestApi()
@@ -67,14 +75,51 @@ class ApiStack private constructor(
         greetingLambda = makeGreetingLambda(
             logicalId = "GetGreetingFunction",
             baseName = "get-greeting-v1",
-            handler = "no.dnb.awsintro.helloapi.functions.GetGreetingHandler",
+            handler = "no.dnb.awsintro.helloapi.functions.GreeterFunctionHandler",
             role = lambdaRole
         )
+
         restApi.addLambdaIntegration(
             "GET",
             "/v1/greeting/{name}",
             greetingLambda
         )
+        restApi.addLambdaIntegration(
+            "GET",
+            "/v1/string-catalog/{stringKey}",
+            greetingLambda
+        )
+        restApi.addLambdaIntegration(
+            "POST",
+            "/v1/string-catalog/",
+            greetingLambda
+        )
+        dynamoDBTable = makeTable()
+        dynamoDBTable.grantReadWriteData(lambdaRole)
+
+        personLambda = makeGreetingLambda(
+            logicalId = "PersonFunction",
+            baseName = "person-v1",
+            handler = "no.dnb.awsintro.helloapi.functions.PersonFunctionHandler",
+            role = lambdaRole
+        )
+
+        Aspects.of(this).add(PermissionBoundaryChecker())
+    }
+
+    private fun makeTable(): ITable {
+        val partitionKey = Attribute.builder()
+            .name("stringKey")
+            .type(AttributeType.STRING)
+            .build()
+
+        val table = Table.Builder
+            .create(this, "dynamoDBtable")
+            .tableName(props.namespace.prefixWithNamespace("StringCatalog"))
+            .partitionKey(partitionKey)
+            .removalPolicy(RemovalPolicy.DESTROY)
+            .build()
+        return table
     }
 
     private fun makeRestApi(): RestApi {
@@ -143,7 +188,7 @@ class ApiStack private constructor(
         return Role.Builder
             .create(this, "LambdaRole")
             .assumedBy(ServicePrincipal("lambda.amazonaws.com"))
-            .roleName("${props.region}-${props.environment}-${props.baseName}-role")
+            .roleName(props.namespace.prefixWithNamespace("role"))
             .description("Role for greeting lambda")
             .managedPolicies(getManagedPolicies())
             .build()
