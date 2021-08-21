@@ -6,6 +6,11 @@ Before reading on, please go to file `Assembly.kt` in infrastructure/src/main/..
 and change the `label` to [your initials][AG start year], e.g. `IL18
 
 ### Build ###
+#### Prerequisites ####
+- Java, e.g. by
+> brew install --cask adoptopenjdk15
+
+#### Instructions ####
 The project uses `Gradle` to compile and package the code.
 No installment of Gradle is necessary.
 
@@ -34,7 +39,7 @@ No installment of Gradle is necessary.
   - Log on to https://myapplications.microsoft.com/ with DNB credentials
   - Select AWS SSO --> your account --> Management console
   
-- Get access to AWS from terminal (first time)
+- If first time in terminal:
   - Run 
     > aws configure sso
   - Set `SSO start url` to https://dnbasa.awsapps.com/start
@@ -43,7 +48,7 @@ No installment of Gradle is necessary.
   `CLI profile name` to a shorter name, e.g. `sand`.
   - The result of the configuration can be seen in file `~/.aws/config`
     
-- Reactivate access from terminal (after activating PIM access)
+- Every time you reactivate PIM access, you also need to log in from terminal:
   > aws sso login --profile [profilename]
 
 #### Deploy to AWS using CDK ####
