@@ -3,7 +3,8 @@ This project consists of two modules
 - `infrastructure` defines the AWS resources to be deployed in AWS
 
 Before reading on, please go to file `Assembly.kt` in infrastructure/src/main/...
-and change the `label` to [your initials][AG start year], e.g. `IL18
+and change the `label` to [your initials][AG start year], e.g. `IL18`. Also,
+set `account` to the AWS account id.
 
 ### Build ###
 #### Prerequisites ####
@@ -58,7 +59,7 @@ No installment of Gradle is necessary.
   - Copy the text from option 2) `Add a profile to your AWS credentials file`
   - Store the text in your `~/.aws/credentials` file. Remember to use the 
     same profile name for the account as you used in the config file.
-    
+
 - Check that everything works as expected by running
   > cdk list
 
